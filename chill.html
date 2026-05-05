@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Kuis Interaktif: Ekosistem Teknologi Digital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', 'Comic Neue', system-ui, -apple-system, 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(125deg, #101f3c 0%, #1e3a5f 50%, #2b5c7a 100%);
+            background-attachment: fixed;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Container utama kuis */
+        .quiz-container {
+            max-width: 1250px;
+            width: 100%;
+            background: rgba(255, 250, 235, 0.97);
+            border-radius: 70px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), inset 0 1px 4px rgba(255,255,240,0.8);
+            overflow: hidden;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        /* Header area */
+        .quiz-header {
+            background: linear-gradient(135deg, #FFB347, #FF8C42, #F76C2E);
+            padding: 25px 30px;
+            text-align: center;
+            border-bottom: 6px solid #FFD966;
+        }
+
+        .quiz-header h1 {
+            font-size: 2rem;
+            color: white;
+            text-shadow: 3px 3px 0 #b64926;
+            letter-spacing: 1px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .quiz-header h1 span {
+            font-size: 2.4rem;
+        }
+
+        .subhead {
+            background: #FEF1CF;
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 60px;
+            font-weight: bold;
+            color: #c05c1e;
+            margin-top: 12px;
+            font-size: 0.9rem;
+            box-shadow: inset 0 0 2px #fff4e0, 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* statistik: skor & progress */
+        .quiz-stats {
+            display: flex;
+            justify-content: space-between;
+            background: #FFF2E0;
+            padding: 12px 30px;
+            border-bottom: 1px solid #FFDBB0;
+        }
+
+        .score-board, .q-counter {
+            background: #2D3047;
+            border-radius: 50px;
+            padding: 5px 20px;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 4px 0 #181c2a;
+        }
+
+        .score-board span:first-child, .q-counter span:first-child {
+            font-size: 1.1rem;
+            background: #FFC857;
+            padding: 4px 10px;
+            border-radius: 30px;
+            color: #2d2f3a;
+        }
+
+        .score-board span:last-child, .q-counter span:last-child {
+            font-size: 1.5rem;
+            font-weight: 800;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        /* area pertanyaan */
+        .question-area {
+            padding: 30px 35px 20px;
+        }
+
+        .question-text {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #1F3A4B;
+            background: #FEF7E8;
+            padding: 20px 25px;
+            border-radius: 60px;
+            margin-bottom: 30px;
+            box-shadow: inset 0 0 0 2px white, 0 12px 18px -8px rgba(0,0,0,0.1);
+            line-height: 1.4;
+        }
+
+        /* pilihan jawaban (grid style) */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .option-btn {
+            background: #FFFFFF;
+            border: 3px solid #FFCF9C;
+            border-radius: 100px;
+            padding: 16px 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #2b3b44;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .option-prefix {
+            background: #ffd7a5;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: #9b4b14;
+            transition: 0.1s;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-3px);
+            background: #FFF5E6;
+            border-color: #FFAE5A;
+            box-shadow: 0 12px 18px -8px rgba(0,0,0,0.2);
+        }
+
+        .option-btn.correct-highlight {
+            background: #C8F0D1;
+            border-color: #2E7D32;
+            box-shadow: 0 0 0 2px #b9f6ca;
+        }
+
+        .option-btn.wrong-highlight {
+            background: #FFD9D9;
+            border-color: #C62828;
+            text-decoration: line-through;
+        }
+
+        .disabled-opt {
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        /* feedback dan next button */
+        .feedback-area {
+            background: #F7E5CD;
+            border-radius: 50px;
+            padding: 18px 25px;
+            margin: 15px 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .feedback-message {
+            font-weight: bold;
+            font-size: 1rem;
+            color: #7b3f00;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            flex: 1;
+        }
+
+        .next-btn {
+            background: #F77F00;
+            border: none;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 10px 28px;
+            border-radius: 50px;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #a14200;
+            transition: 0.07s linear;
+        }
+
+        .next-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #a14200;
+        }
+
+        .next-btn:disabled {
+            opacity: 0.5;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        /* hasil akhir */
+        .result-area {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .final-score-card {
+            background: linear-gradient(145deg, #FFE6C7, #FFD0A4);
+            border-radius: 70px;
+            padding: 30px;
+            margin: 20px;
+        }
+
+        .final-score-card h2 {
+            font-size: 2.2rem;
+            color: #9b3c0c;
+        }
+
+        .final-score {
+            font-size: 4rem;
+            font-weight: 800;
+            background: white;
+            display: inline-block;
+            padding: 10px 35px;
+            border-radius: 80px;
+            margin: 15px 0;
+            color: #e67e22;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05), 0 8px 18px rgba(0,0,0,0.1);
+        }
+
+        .restart-quiz {
+            background: #2c3e66;
+            border: none;
+            font-size: 1.3rem;
+            padding: 12px 35px;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: bold;
+            box-shadow: 0 6px 0 #141c33;
+            transition: 0.07s linear;
+        }
+
+        .restart-quiz:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #141c33;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            padding: 16px;
+            background: #F0E2CF;
+            color: #886e4b;
+        }
+
+        @media (max-width: 650px) {
+            .question-text {
+                font-size: 1.2rem;
+                padding: 15px;
+            }
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .quiz-header h1 {
+                font-size: 1.3rem;
+            }
+            .feedback-area {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="quiz-container" id="quizApp">
+    <div class="quiz-header">
+        <h1>
+            <span></span> Navigasi Ekosistem Teknologi Digital <span></span>
+        </h1>
+        <div class="subhead">Uji pemahamanmu tentang Web, Hosting, Desain & Karier IT!</div>
+    </div>
+    <div class="quiz-stats">
+        <div class="score-board">
+            <span>SKOR</span>
+            <span id="scoreValue">0</span>
+        </div>
+        <div class="q-counter">
+            <span>SOAL</span>
+            <span id="questionCounter">1 / 8</span>
+        </div>
+    </div>
+
+    <div id="dynamicContent">
+        <!-- konten akan diisi javascript (pertanyaan atau hasil) -->
+    </div>
+    <footer>Selamat bermain dan belajar!</footer>
+</div>
+
+<script>
+    // ---------- DAFTAR SOAL (Materi Modul 1 s/d 5 dan Kesimpulan) ----------
+    const quizData = [
+        { // soal 1: modul 1 - perbedaan statis vs dinamis
+            question: "Apa perbedaan utama antara situs web STATIS dan DINAMIS?",
+            options: [
+                "Statis memiliki animasi, dinamis tidak punya gambar",
+                "Statis kontennya tetap & jarang berubah, Dinamis konten real-time dari database",
+                "Statis butuh login, Dinamis tidak butuh internet",
+                "Statis lebih lambat, Dinamis lebih cepat"
+            ],
+            correct: 1,
+            explanation: "Situs statis kontennya tetap & file langsung dikirim. Situs dinamis mengambil data dari database secara real-time, contoh e-commerce."
+        },
+        { // soal 2: modul 2 - domain & hosting
+            question: "Apa fungsi DOMAIN dalam infrastruktur digital?",
+            options: [
+                "Tempat menyimpan file website",
+                "Alamat unik yang diketik di browser sebagai identitas website",
+                "Bahasa pemrograman untuk backend",
+                "Desain antarmuka pengguna"
+            ],
+            correct: 1,
+            explanation: "Domain adalah alamat unik (seperti .com, .id) yang memudahkan pengguna mengakses website tanpa mengingat IP."
+        },
+        { // soal 3 : Hosting
+            question: "Manakah pernyataan yang PALING TEPAT tentang HOSTING?",
+            options: [
+                "Hosting hanya diperlukan untuk website dinamis",
+                "Hosting adalah ruang penyimpanan digital agar website bisa diakses 24/7",
+                "Hosting sama dengan domain",
+                "Hosting digunakan untuk mendesain tampilan website"
+            ],
+            correct: 1,
+            explanation: "Hosting adalah tempat menyimpan semua file, gambar, database website agar selalu online dan diakses publik."
+        },
+        { // soal 4: modul 3 - Tren desain masa depan (Dark Mode & AI)
+            question: "Sebutkan keunggulan dari mode gelap (Dark Mode) pada desain modern!",
+            options: [
+                "Membuat teks menjadi lebih sulit dibaca",
+                "Menghemat baterai pada layar OLED dan mengurangi kelelahan mata",
+                "Memperlambat loading website",
+                "Hanya untuk estetika tanpa manfaat fungsional"
+            ],
+            correct: 1,
+            explanation: "Dark mode menghemat baterai di layar OLED, mengurangi kelelahan mata, dan memberi kesan modern & elegan."
+        },
+        { // soal 5: Integrasi AI dalam desain
+            question: "Apa contoh integrasi Kecerdasan Buatan (AI) dalam dunia web saat ini?",
+            options: [
+                "Mengedit HTML manual",
+                "Membuat database tanpa kode",
+                "Personalisaasi tampilan berdasarkan perilaku pengguna & chatbot responsif",
+                "Mengganti seluruh fungsi developer"
+            ],
+            correct: 2,
+            explanation: "AI digunakan untuk personalisasi konten, chatbot, dan desain generatif — meningkatkan pengalaman pengguna."
+        },
+        { // soal 6: modul 4 - Front-End vs Back-End
+            question: "Apa fokus utama seorang FRONT-END DEVELOPER?",
+            options: [
+                "Mengelola server dan database",
+                "Mendesain logika keamanan dan performa server",
+                "Apa yang dilihat pengguna (layout, tombol, animasi) dengan HTML, CSS, JS",
+                "Menulis kode bahasa Java untuk skala besar"
+            ],
+            correct: 2,
+            explanation: "Front-End mengerjakan tampilan & interaksi langsung di browser (HTML, CSS, JS). Back-End fokus ke server."
+        },
+        { // soal 7: modul 5 - Gamifikasi & Alat bantu interaktif
+            question: "Manakah alat yang cocok untuk membuat kuis interaktif dan polling langsung dalam presentasi?",
+            options: [
+                "Microsoft Word",
+                "AhaSlides & PowerPoint (Hyperlink/Trigger)",
+                "Photoshop",
+                "MySQL"
+            ],
+            correct: 1,
+            explanation: "AhaSlides untuk kuis langsung, PowerPoint bisa memanfaatkan hyperlink untuk game, dan Canva untuk aset visual."
+        },
+        { // soal 8: Kesimpulan / integrasi
+            question: "Apa pesan utama dari materi 'Navigasi Ekosistem Teknologi Digital'?",
+            options: [
+                "Teknologi hanya tentang coding rumit",
+                "Inovasi digital harus mahal dan eksklusif",
+                " Integrasi web kokoh, desain adaptif, dan edukasi interaktif adalah kunci pengalaman digital efektif",
+                "Tidak perlu desain dan hosting yang baik"
+            ],
+            correct: 2,
+            explanation: "Inovasi teknologi bukan hanya kecanggihan, tapi bagaimana memanfaatkannya untuk menyampaikan pesan lebih menarik & memecahkan masalah."
+        }
+    ];
+
+    // Variabel state
+    let currentIndex = 0;          // index soal saat ini (0-7)
+    let userScore = 0;
+    let answerLocked = false;       // apakah sudah menjawab di soal ini
+    let totalQuestions = quizData.length; // 8
+
+    // DOM elemen yang akan di-render
+    const dynamicContainer = document.getElementById("dynamicContent");
+    const scoreSpan = document.getElementById("scoreValue");
+    const qCounterSpan = document.getElementById("questionCounter");
+
+    // Fungsi update score & counter di navbar
+    function updateStatsUI() {
+        scoreSpan.innerText = userScore;
+        qCounterSpan.innerText = `${currentIndex+1} / ${totalQuestions}`;
+    }
+
+    // Render halaman kuis (soal aktif)
+    function renderCurrentQuestion() {
+        if (currentIndex < totalQuestions) {
+            const qData = quizData[currentIndex];
+            // generate HTML untuk soal
+            let optionsHtml = "";
+            const letters = ["A", "B", "C", "D"];
+            qData.options.forEach((opt, idx) => {
+                optionsHtml += `
+                    <div class="option-btn" data-opt-index="${idx}">
+                        <div class="option-prefix">${letters[idx]}</div>
+                        <div class="opt-text">${escapeHtml(opt)}</div>
+                    </div>
+                `;
+            });
+
+            const html = `
+                <div class="question-area">
+                    <div class="question-text">${escapeHtml(qData.question)}</div>
+                    <div class="options-grid" id="optionsGrid">
+                        ${optionsHtml}
+                    </div>
+                    <div class="feedback-area" id="feedbackArea">
+                        <div class="feedback-message" id="feedbackMsg">
+                            Klik salah satu jawaban untuk menjawab!
+                        </div>
+                        <button class="next-btn" id="nextButton" disabled>Selanjutnya</button>
+                    </div>
+                </div>
+            `;
+            dynamicContainer.innerHTML = html;
+
+            // attach event listeners ke option button
+            const optButtons = document.querySelectorAll(".option-btn");
+            const nextBtn = document.getElementById("nextButton");
+            const feedbackDiv = document.getElementById("feedbackMsg");
+
+            // reset answerLocked untuk soal baru
+            answerLocked = false;
+            // aktifkan semua tombol opsional (tanpa disabled class)
+            optButtons.forEach(btn => {
+                btn.classList.remove("correct-highlight", "wrong-highlight", "disabled-opt");
+                btn.style.pointerEvents = "auto";
+            });
+
+            // event handler untuk setiap opsi
+            optButtons.forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    if (answerLocked) {
+                        // sudah menjawab, tidak bisa pilih lagi
+                        feedbackDiv.innerHTML = "Kamu sudah menjawab! Klik 'Selanjutnya' untuk lanjut.";
+                        return;
+                    }
+                    const selectedIdx = parseInt(btn.getAttribute("data-opt-index"));
+                    const isCorrect = (selectedIdx === qData.correct);
+                    
+                    // LOCK jawaban
+                    answerLocked = true;
+                    
+                    // Update skor jika benar
+                    if (isCorrect) {
+                        userScore++;
+                        updateStatsUI();
+                        feedbackDiv.innerHTML = `BENAR!<br> ${escapeHtml(qData.explanation)}`;
+                    } else {
+                        const jawabanBenar = qData.options[qData.correct];
+                        feedbackDiv.innerHTML = `Kurang tepat!<br> Jawaban yang benar: ${escapeHtml(jawabanBenar)}<br>${escapeHtml(qData.explanation)}`;
+                    }
+                    
+                    // beri highlight visual pada opsi yang dipilih (dan opsi benar jika salah)
+                    optButtons.forEach(button => {
+                        const idxBtn = parseInt(button.getAttribute("data-opt-index"));
+                        if (idxBtn === selectedIdx) {
+                            if (isCorrect) {
+                                button.classList.add("correct-highlight");
+                            } else {
+                                button.classList.add("wrong-highlight");
+                            }
+                        }
+                        // jika jawabannya salah, tunjukkan opsi yang benar sebagai info (highlight hijau)
+                        if (!isCorrect && idxBtn === qData.correct) {
+                            button.classList.add("correct-highlight");
+                        }
+                        // disable semua tombol opsi setelah menjawab
+                        button.style.pointerEvents = "none";
+                        button.classList.add("disabled-opt");
+                    });
+                    
+                    // aktifkan tombol next
+                    nextBtn.disabled = false;
+                });
+            });
+            
+            // event next button
+            nextBtn.addEventListener("click", () => {
+                if (!answerLocked) {
+                    feedbackDiv.innerHTML = "Pilih jawaban dulu ya, baru lanjut!";
+                    return;
+                }
+                // pindah ke soal berikutnya atau selesai
+                if (currentIndex + 1 < totalQuestions) {
+                    currentIndex++;
+                    updateStatsUI();
+                    renderCurrentQuestion();
+                } else {
+                    // kuis selesai, tampilkan hasil akhir
+                    showResultScreen();
+                }
+            });
+            
+        } else {
+            // fallback ke result
+            showResultScreen();
+        }
+    }
+
+    // tampilan hasil akhir
+    function showResultScreen() {
+        let praiseMessage = "";
+        if (userScore === totalQuestions) {
+            praiseMessage = "SEMPURNA! Kamu menguasai ekosistem digital!";
+        } else if (userScore >= 6) {
+            praiseMessage = "Hebat! Pemahamanmu sangat baik. Terus belajar!";
+        } else if (userScore >= 4) {
+            praiseMessage = "Lumayan! Simak lagi materi presentasi biar makin jago!";
+        } else {
+            praiseMessage = "Jangan menyerah! Coba lagi dan pelajari setiap modul dengan seru";
+        }
+        
+        const resultHtml = `
+            <div class="result-area">
+                <div class="final-score-card">
+                    <h2>Permainan Selesai</h2>
+                    <div class="final-score">${userScore} / ${totalQuestions}</div>
+                    <p style="font-size: 1.2rem; font-weight:bold; background:#FFF1DD; padding:10px; border-radius:40px;">${praiseMessage}</p>
+                    <button class="restart-quiz" id="restartQuizBtn">Main Lagi / Ulang Kuis</button>
+                </div>
+                <div style="background:#FFE9D4; border-radius: 40px; padding: 15px; margin-top: 12px;">
+                    <strong>Rangkuman Kilat :</strong><br>
+                    Statis vs Dinamis | Domain & Hosting | Dark Mode & AI | Front-End & Back-End | Gamifikasi & AhaSlides<br>
+                    Terus eksplor teknologi biar makin kreatif!
+                </div>
+            </div>
+        `;
+        dynamicContainer.innerHTML = resultHtml;
+        const restartBtn = document.getElementById("restartQuizBtn");
+        if (restartBtn) {
+            restartBtn.addEventListener("click", () => {
+                resetQuiz();
+            });
+        }
+    }
+    
+    // reset semua state
+    function resetQuiz() {
+        currentIndex = 0;
+        userScore = 0;
+        answerLocked = false;
+        updateStatsUI();
+        renderCurrentQuestion();
+    }
+    
+    // simple escape HTML (untuk keamanan)
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+    
+    // inisiasi awal
+    function initQuiz() {
+        updateStatsUI();
+        renderCurrentQuestion();
+    }
+    
+    initQuiz();
+</script>
+</body>
+</html>
